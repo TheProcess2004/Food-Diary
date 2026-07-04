@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Carnet — Prise de masse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F7F3EC;
+    --paper-dark: #EFE8DA;
+    --ink: #2B2320;
+    --wood: #8A6D4A;
+    --terracotta: #C1512D;
+    --sapin: #4A6B4F;
+    --moutarde: #C4923A;
+    --line: rgba(43,35,32,0.14);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(43,35,32,0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+
+  .wrap{ max-width: 720px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* ---------- HEADER ---------- */
+  header{ margin-bottom: 22px; }
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--wood);
+    margin: 0 0 6px;
+  }
+  h1{
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(32px, 8vw, 44px);
+    line-height: 0.98;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  h1 em{
+    font-style: italic;
+    font-weight: 300;
+    color: var(--terracotta);
+  }
+  .sub{
+    font-size: 15px;
+    color: rgba(43,35,32,0.65);
+    margin: 6px 0 0;
+    max-width: 46ch;
+  }
+
+  /* ---------- TICKET (compteur du jour) ---------- */
+  .ticket{
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 2px;
+    padding: 20px 20px 16px;
+    margin: 24px 0 28px;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 12px 24px -12px rgba(43,35,32,0.5);
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute; left:0; right:0; height:10px;
+    background:
+      radial-gradient(circle at 8px 5px, var(--paper) 5px, transparent 5.5px) repeat-x;
+    background-size: 16px 10px;
+  }
+  .ticket::before{ top:-5px; }
+  .ticket::after{ bottom:-5px; transform: rotate(180deg); }
+
+  .ticket-title{
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 12px;
+    display:flex; justify-content: space-between;
+  }
+  .ticket-row{
+    display:flex; justify-content: space-between; align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px dashed rgba(247,243,236,0.18);
+    font-size: 14px;
+  }
+  .ticket-row:last-of-type{ border-bottom: none; }
+  .ticket-row .label{ opacity: 0.75; }
+  .ticket-row .val{ font-weight: 700; font-size: 16px; }
+  .ticket-row .goal{ font-size: 11px; opacity: 0.5; margin-left: 6px; }
+
+  .bar-track{
+    height: 6px; background: rgba(247,243,236,0.15);
+    border-radius: 3px; margin-top: 4px; overflow:hidden;
+  }
+  .bar-fill{ height:100%; border-radius: 3px; transition: width 0.4s ease; }
+
+  .stamp{
+    position: absolute; top: 18px; right: 18px;
+    border: 2px solid var(--sapin);
+    color: var(--sapin);
+    background: rgba(74,107,79,0.12);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 5px 9px;
+    border-radius: 4px;
+    transform: rotate(-6deg);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-transform: uppercase;
+  }
+  .stamp.show{ opacity: 1; }
+
+  /* ---------- ONGLETS ---------- */
+  nav.tabs{
+    display:flex; gap: 6px; overflow-x:auto;
+    margin-bottom: 20px; padding-bottom: 2px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  nav.tabs::-webkit-scrollbar{ display:none; }
+  .tab-btn{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    padding: 9px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .tab-btn.active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .tab-btn .count{
+    display:inline-block; margin-left:5px;
+    opacity:0.55; font-size: 11px;
+  }
+
+  /* ---------- SECTION ---------- */
+  section{ display:none; }
+  section.active{ display:block; animation: fade 0.25s ease; }
+  @keyframes fade{ from{opacity:0; transform: translateY(4px);} to{opacity:1; transform:none;} }
+
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+  }
+  .section-head h2{
+    font-family:'Fraunces', serif; font-weight:600;
+    font-size: 22px; margin:0;
+  }
+  .section-head .target{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--wood);
+  }
+
+  /* ---------- CARD ---------- */
+  .card{
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 3px;
+    padding: 16px 16px 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .card:hover{ border-color: var(--wood); }
+  .card.selected{
+    background: var(--paper-dark);
+    border-color: var(--sapin);
+    border-width: 1.5px;
+  }
+  .card.selected::before{
+    content: "✓";
+    position: absolute; top: -9px; left: 14px;
+    background: var(--sapin);
+    color: var(--paper);
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .card-top{
+    display:flex; justify-content: space-between; align-items:flex-start;
+    gap: 10px; margin-bottom: 8px;
+  }
+  .card-name{
+    font-family:'Fraunces', serif; font-weight: 600;
+    font-size: 17px; line-height:1.25;
+  }
+  .card-kcal{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px; font-weight:700;
+    color: var(--terracotta);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  .card-items{
+    list-style:none; margin:0 0 10px; padding:0;
+    font-size: 13.5px; color: rgba(43,35,32,0.8);
+  }
+  .card-items li{
+    padding: 3px 0 3px 14px;
+    position: relative;
+  }
+  .card-items li::before{
+    content:"–"; position:absolute; left:0; color: var(--wood);
+  }
+  .qty{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:600; color: var(--ink);
+  }
+
+  .macros{
+    display:flex; gap: 14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+  }
+  .macro{ display:flex; align-items:center; gap:4px; }
+  .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .dot.p{ background: var(--sapin); }
+  .dot.g{ background: var(--moutarde); }
+  .dot.l{ background: var(--terracotta); }
+
+  /* ---------- FOOTER NOTE ---------- */
+  .note{
+    font-size: 12.5px;
+    color: rgba(43,35,32,0.55);
+    text-align:center;
+    margin-top: 32px;
+    line-height: 1.6;
+  }
+  .note strong{ color: var(--ink); }
+
+  .reset-btn{
+    display:block; margin: 18px auto 0;
+    background:none; border: 1.5px solid var(--line);
+    color: var(--ink); font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px; padding: 8px 16px; border-radius: 20px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{ border-color: var(--terracotta); color: var(--terracotta); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Arc jurassien · Prise de masse</p>
+    <h1>Le Carnet <em>des repas</em></h1>
+    <p class="sub">Choisis une option par repas. Objectif du jour : ~3300 kcal, ~130 g de protéines. Coche, compare, ajuste.</p>
+  </header>
+
+  <div class="ticket">
+    <div class="stamp" id="stamp">Objectif ✓</div>
+    <div class="ticket-title"><span>Ticket du jour</span><span id="ticket-count">0 / 5 repas choisis</span></div>
+
+    <div class="ticket-row">
+      <span class="label">Calories</span>
+      <span><span class="val" id="tot-kcal">0</span><span class="goal">/ 3300 kcal</span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-kcal" style="width:0%; background:var(--terracotta);"></div></div>
+
+    <div class="ticket-row" style="margin-top:10px;">
+      <span class="label">Protéines</span>
+      <span><span class="val" id="tot-prot">0</span><span class="goal">/ 130 g</span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-prot" style="width:0%; background:var(--sapin);"></div></div>
+
+    <div class="ticket-row">
+      <span class="label">Glucides</span>
+      <span><span class="val" id="tot-carb">0</span><span class="goal">g</span></span>
+    </div>
+    <div class="ticket-row">
+      <span class="label">Lipides</span>
+      <span><span class="val" id="tot-fat">0</span><span class="goal">g</span></span>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div id="sections"></div>
+
+  <button class="reset-btn" id="reset">↺ Réinitialiser mes choix</button>
+
+  <p class="note">
+    <strong>Astuce :</strong> tous les féculents (riz, pâtes, quinoa, lentilles, pois chiches) sont indiqués en poids cru/sec — pèse-les avant cuisson, c'est plus simple et plus précis.<br>
+    Pèse tes aliments les 2-3 premières semaines — c'est la seule façon de savoir si tu manges vraiment ton surplus.<br>
+    Un jour sans prise de poids après 2 semaines ? Ajoute une collation de +200 kcal.<br>
+    Valeurs nutritionnelles calculées à partir de tables de référence (CIQUAL/USDA), aliments à l'état cru sauf mention contraire (thon, jambon, fromages, tofu = prêts à consommer).
+  </p>
+
+</div>
+
+<script>
+const DATA = {
+  "petit-déj": {
+    label: "Petit-déj",
+    target: "~500-900 kcal",
+    options: [
+      {
+        name: "Le Classique Avoine-Banane",
+        kcal: 898, p: 40.9, g: 96.1, l: 40.3,
+        items: [
+          ["Flocons d'avoine", "80 g"],
+          ["Lait entier", "3 dl"],
+          ["Banane", "1 grosse (120 g)"],
+          ["Beurre de cacahuète", "25 g"],
+          ["Œuf entier", "2 pièces"]
+        ]
+      },
+      {
+        name: "Le Rösti du Bûcheron",
+        kcal: 687, p: 48.1, g: 50.9, l: 32.6,
+        items: [
+          ["Pain complet", "3 tranches (120 g)"],
+          ["Gruyère", "50 g"],
+          ["Jambon de campagne", "60 g"],
+          ["Œuf entier", "2 pièces"]
+        ]
+      },
+      {
+        name: "Le Bircher Costaud",
+        kcal: 698, p: 36.0, g: 84.7, l: 25.1,
+        items: [
+          ["Flocons d'avoine", "70 g"],
+          ["Skyr nature", "200 g"],
+          ["Pomme râpée", "1 grosse (130 g)"],
+          ["Noix", "30 g"],
+          ["Miel", "1 c. à soupe (15 g)"]
+        ]
+      },
+      {
+        name: "Le Protéiné Rapide",
+        kcal: 624, p: 59.4, g: 80.2, l: 8.8,
+        items: [
+          ["Pain complet grillé", "4 tranches (100 g)"],
+          ["Séré maigre", "200 g"],
+          ["Miel", "2 c. à soupe (30 g)"],
+          ["Whey protéine", "1 mesure (30 g)"],
+          ["Lait entier", "1 dl"]
+        ]
+      },
+      {
+        name: "Amandes & Skyr du Matin",
+        kcal: 495, p: 36.0, g: 53.0, l: 17.9,
+        items: [
+          ["Skyr nature", "250 g"],
+          ["Amandes", "35 g (~28 pièces)"],
+          ["Miel", "1 c. à soupe (15 g)"],
+          ["Banane", "1 pièce (100 g)"]
+        ]
+      }
+    ]
+  },
+  "collation-am": {
+    label: "Collation matin",
+    target: "~300-400 kcal",
+    options: [
+      {
+        name: "Séré & Miel & Amandes",
+        kcal: 331, p: 34.2, g: 26.7, l: 10.3,
+        items: [
+          ["Séré maigre", "250 g"],
+          ["Miel", "1 c. à soupe (15 g)"],
+          ["Amandes", "20 g (~16 pièces)"]
+        ]
+      },
+      {
+        name: "La Tartine du Marché",
+        kcal: 366, p: 17.6, g: 48.5, l: 12.4,
+        items: [
+          ["Pain complet", "2 tranches (70 g)"],
+          ["Chèvre frais", "40 g"],
+          ["Jambon de campagne", "40 g"],
+          ["Pomme", "1 grosse (130 g)"]
+        ]
+      },
+      {
+        name: "Granola Maison & Fruit",
+        kcal: 383, p: 33.5, g: 56.1, l: 3.6,
+        items: [
+          ["Flocons d'avoine grillés au miel", "30 g"],
+          ["Miel", "2 c. à café (10 g)"],
+          ["Skyr nature", "150 g"],
+          ["Banane", "1 pièce (100 g)"],
+          ["Whey protéine", "1/2 mesure (15 g)"]
+        ]
+      },
+      {
+        name: "Poignée d'Amandes Pure",
+        kcal: 396, p: 17.8, g: 32.1, l: 24.3,
+        items: [
+          ["Amandes", "45 g (~36 pièces)"],
+          ["Pomme", "1 grosse (130 g)"],
+          ["Fromage blanc 0-5%", "100 g"]
+        ]
+      }
+    ]
+  },
+  "dîner": {
+    label: "Dîner (midi)",
+    target: "~500-900 kcal",
+    options: [
+      {
+        name: "Poulet-Riz du Sportif",
+        kcal: 624, p: 48.0, g: 74.1, l: 15.1,
+        items: [
+          ["Blanc de poulet cru", "180 g"],
+          ["Riz basmati, poids cru", "95 g"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"],
+          ["Légumes vapeur au choix", "libre"]
+        ]
+      },
+      {
+        name: "Le Bœuf-Pâtes Jurassien",
+        kcal: 815, p: 50.9, g: 74.5, l: 33.1,
+        items: [
+          ["Bœuf haché 15% MG cru", "180 g"],
+          ["Pâtes, poids cru", "105 g"],
+          ["Gruyère râpé", "15 g"],
+          ["Sauce tomate maison", "libre"]
+        ]
+      },
+      {
+        name: "Cabillaud & Patate Douce",
+        kcal: 510, p: 40.8, g: 60.0, l: 11.7,
+        items: [
+          ["Filet de cabillaud cru", "200 g"],
+          ["Patate douce, poids cru", "300 g"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"],
+          ["Épinards ou haricots verts", "libre"]
+        ]
+      },
+      {
+        name: "Le Végé Costaud (tofu)",
+        kcal: 826, p: 45.0, g: 68.5, l: 39.8,
+        items: [
+          ["Tofu ferme", "220 g"],
+          ["Quinoa, poids cru", "95 g"],
+          ["Amandes effilées", "15 g"],
+          ["Huile d'olive", "1 c. à café (8 g)"]
+        ]
+      },
+      {
+        name: "Thon-Riz Minute",
+        kcal: 641, p: 56.6, g: 74.1, l: 12.6,
+        items: [
+          ["Thon au naturel, égoutté", "200 g (~2 boîtes)"],
+          ["Riz basmati, poids cru", "95 g"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"]
+        ]
+      },
+      {
+        name: "Salade de Lentilles au Thon",
+        kcal: 706, p: 70.0, g: 72.0, l: 14.9,
+        items: [
+          ["Lentilles vertes, poids cru (sèches)", "120 g"],
+          ["Thon au naturel, égoutté", "160 g (~1,5 boîte)"],
+          ["Huile d'olive", "1 c. à soupe (12 g)"]
+        ]
+      }
+    ]
+  },
+  "collation-pm": {
+    label: "Collation pré/post-training",
+    target: "~300-450 kcal",
+    options: [
+      {
+        name: "Sandwich Jambon-Fromage",
+        kcal: 333, p: 23.7, g: 29.2, l: 13.6,
+        items: [
+          ["Pain complet", "2 tranches (70 g)"],
+          ["Jambon de derrière", "50 g"],
+          ["Gruyère", "30 g"]
+        ]
+      },
+      {
+        name: "Shake & Banane",
+        kcal: 453, p: 36.2, g: 53.4, l: 12.6,
+        items: [
+          ["Whey protéine", "1 mesure (30 g)"],
+          ["Lait entier", "2,5 dl"],
+          ["Banane", "1 grosse (120 g)"],
+          ["Flocons d'avoine", "20 g"]
+        ]
+      },
+      {
+        name: "Séré & Fruits Secs",
+        kcal: 321, p: 28.4, g: 33.8, l: 9.3,
+        items: [
+          ["Séré maigre", "200 g"],
+          ["Raisins secs", "25 g"],
+          ["Noix de cajou", "20 g"]
+        ]
+      },
+      {
+        name: "Sandwich Thon-Amandes",
+        kcal: 373, p: 38.8, g: 32.0, l: 10.6,
+        items: [
+          ["Pain complet", "2 tranches (70 g)"],
+          ["Thon au naturel, égoutté", "120 g (1 boîte)"],
+          ["Amandes", "15 g"]
+        ]
+      },
+      {
+        name: "Pomme & Beurre de Cacahuète",
+        kcal: 349, p: 24.4, g: 33.0, l: 15.6,
+        items: [
+          ["Pomme", "1 grosse (150 g)"],
+          ["Beurre de cacahuète", "30 g"],
+          ["Skyr nature", "150 g"]
+        ]
+      }
+    ]
+  },
+  "souper": {
+    label: "Souper",
+    target: "~500-800 kcal",
+    options: [
+      {
+        name: "Œufs-Patates du Chalet",
+        kcal: 539, p: 32.6, g: 44.1, l: 25.8,
+        items: [
+          ["Œufs entiers", "3 pièces (150 g)"],
+          ["Pommes de terre, poids cru", "250 g"],
+          ["Gruyère râpé", "30 g"],
+          ["Salade verte + vinaigrette", "libre"]
+        ]
+      },
+      {
+        name: "Poisson & Pâtes Complètes",
+        kcal: 601, p: 46.0, g: 69.3, l: 13.9,
+        items: [
+          ["Filet de cabillaud cru", "180 g"],
+          ["Pâtes complètes, poids cru", "105 g"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"]
+        ]
+      },
+      {
+        name: "Poulet-Riz du Soir",
+        kcal: 644, p: 48.9, g: 77.0, l: 15.4,
+        items: [
+          ["Blanc de poulet cru", "180 g"],
+          ["Riz complet, poids cru", "100 g"],
+          ["Huile d'olive", "1 c. à café (8 g)"],
+          ["Légumes verts au choix", "libre"]
+        ]
+      },
+      {
+        name: "Lentilles au Jambon Fumé",
+        kcal: 672, p: 42.6, g: 76.3, l: 21.1,
+        items: [
+          ["Lentilles vertes, poids cru (sèches)", "105 g"],
+          ["Saucisse de veau ou cervelas", "1 pièce (100 g)"],
+          ["Pain de campagne", "1 tranche (30 g)"]
+        ]
+      },
+      {
+        name: "Thon-Quinoa du Soir",
+        kcal: 636, p: 58.3, g: 60.8, l: 17.5,
+        items: [
+          ["Thon au naturel, égoutté", "180 g"],
+          ["Quinoa, poids cru", "95 g"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"]
+        ]
+      },
+      {
+        name: "Pois Chiches au Chèvre",
+        kcal: 818, p: 41.2, g: 76.1, l: 40.2,
+        items: [
+          ["Pois chiches, poids cru (secs)", "120 g"],
+          ["Chèvre frais", "60 g"],
+          ["Œuf entier", "2 pièces"],
+          ["Huile d'olive", "1 c. à soupe (10 g)"]
+        ]
+      }
+    ]
+  },
+  "avant-coucher": {
+    label: "Avant coucher",
+    target: "~150-200 kcal (optionnel)",
+    options: [
+      {
+        name: "Yogourt Grec Nature",
+        kcal: 194, p: 18.0, g: 8.0, l: 10.0,
+        items: [
+          ["Yogourt grec entier", "200 g"]
+        ]
+      },
+      {
+        name: "Séré Maigre & Amandes",
+        kcal: 205, p: 26.5, g: 10.6, l: 6.3,
+        items: [
+          ["Séré maigre", "200 g"],
+          ["Amandes", "12 g (~10 pièces)"]
+        ]
+      },
+      {
+        name: "Petit Fromage Blanc",
+        kcal: 160, p: 16.0, g: 14.6, l: 4.0,
+        items: [
+          ["Fromage blanc 0-5%", "200 g"],
+          ["Miel", "1 c. à café (8 g)"]
+        ]
+      }
+    ]
+  }
+};
+
+const state = {}; // { categoryKey: optionIndex or null }
+Object.keys(DATA).forEach(k => state[k] = null);
+
+const tabsEl = document.getElementById('tabs');
+const sectionsEl = document.getElementById('sections');
+let activeTab = Object.keys(DATA)[0];
+
+function render(){
+  tabsEl.innerHTML = '';
+  sectionsEl.innerHTML = '';
+
+  Object.entries(DATA).forEach(([key, cat]) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (key === activeTab ? ' active' : '');
+    btn.innerHTML = cat.label + (state[key] !== null ? '<span class="count">✓</span>' : '');
+    btn.onclick = () => { activeTab = key; render(); };
+    tabsEl.appendChild(btn);
+
+    const section = document.createElement('section');
+    section.className = 'section' + (key === activeTab ? ' active' : '');
+
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `<h2>${cat.label}</h2><span class="target">${cat.target}</span>`;
+    section.appendChild(head);
+
+    cat.options.forEach((opt, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card' + (state[key] === idx ? ' selected' : '');
+      card.onclick = () => {
+        state[key] = (state[key] === idx) ? null : idx;
+        render();
+        updateTicket();
+      };
+
+      const itemsHtml = opt.items.map(([name, qty]) =>
+        `<li>${name} — <span class="qty">${qty}</span></li>`
+      ).join('');
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-name">${opt.name}</div>
+          <div class="card-kcal">${opt.kcal} kcal</div>
+        </div>
+        <ul class="card-items">${itemsHtml}</ul>
+        <div class="macros">
+          <span class="macro"><span class="dot p"></span>${opt.p} g prot.</span>
+          <span class="macro"><span class="dot g"></span>${opt.g} g gluc.</span>
+          <span class="macro"><span class="dot l"></span>${opt.l} g lip.</span>
+        </div>
+      `;
+      section.appendChild(card);
+    });
+
+    sectionsEl.appendChild(section);
+  });
+}
+
+function updateTicket(){
+  let kcal=0, p=0, g=0, l=0, chosen=0;
+  Object.entries(DATA).forEach(([key, cat]) => {
+    if(state[key] !== null){
+      const opt = cat.options[state[key]];
+      kcal += opt.kcal; p += opt.p; g += opt.g; l += opt.l;
+      chosen++;
+    }
+  });
+
+  document.getElementById('tot-kcal').textContent = kcal;
+  document.getElementById('tot-prot').textContent = p;
+  document.getElementById('tot-carb').textContent = g;
+  document.getElementById('tot-fat').textContent = l;
+  document.getElementById('ticket-count').textContent = `${chosen} / ${Object.keys(DATA).length} repas choisis`;
+
+  const kcalGoal = 3300, protGoal = 130;
+  document.getElementById('bar-kcal').style.width = Math.min(100, (kcal/kcalGoal)*100) + '%';
+  document.getElementById('bar-prot').style.width = Math.min(100, (p/protGoal)*100) + '%';
+
+  const stamp = document.getElementById('stamp');
+  if(kcal >= kcalGoal*0.92 && p >= protGoal*0.9){
+    stamp.classList.add('show');
+  } else {
+    stamp.classList.remove('show');
+  }
+}
+
+document.getElementById('reset').onclick = () => {
+  Object.keys(state).forEach(k => state[k] = null);
+  render();
+  updateTicket();
+};
+
+render();
+updateTicket();
+</script>
+</body>
+</html>
